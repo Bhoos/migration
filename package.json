@@ -9,6 +9,9 @@
   },
   "repository": "git@github.com:bhoos/migration",
   "author": "Ranjan Shrestha <ranjan@sharingapples.com>",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^18.7.9",
