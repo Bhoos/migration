@@ -102,3 +102,12 @@ dist
 
 # TernJS port file
 .tern-port
+
+
+# Migration Storage file use for demo
+/migration.json
+
+# typescript build output folder
+es6
+
+.DS_Store
