@@ -1,9 +1,12 @@
 {
   "name": "@bhoos/migration",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "Bhoos Database Migration Support Library",
   "main": "es6/index.js",
+  "files": [
+    "es6"
+  ],
   "scripts": {
     "build": "tsc"
   },
