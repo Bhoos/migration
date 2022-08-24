@@ -135,13 +135,16 @@ export abstract class DatabaseBase implements Database {
       id SERIAL NOT NULL PRIMARY KEY,
       timestamp INT NOT NULL,
       entities TEXT,
-      records TEXT,
+      records TEXT
     )`);
 
     const res = await this.run<{ version: number }>(
       `SELECT MAX(id) as version FROM "${this.migrationTable}"`
     );
-    const version = res.length ? res[0].version : 0;
+    const version = res[0].version || 0;
+    if (version === 0) {
+      return { version: 0, entities: [], records: []};
+    }
 
     const data = await this.run<{ entities: string, records: string}>(
       `SELECT entities, records FROM "${this.migrationTable}" WHERE id=${version}`);
