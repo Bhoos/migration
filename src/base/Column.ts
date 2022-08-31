@@ -21,7 +21,7 @@ export class ColumnBase extends Item implements Column {
 
     obj.dataType = this.dataType;
     obj.nullable = this.nullable;
-    
+
     return obj;
   }
 
@@ -80,7 +80,7 @@ export class ColumnBase extends Item implements Column {
   get json() {
     return this.type('JSON');
   }
-  
+
   col(name: string) {
     return this.table.col(name);
   }
@@ -114,7 +114,7 @@ export class ColumnBase extends Item implements Column {
   isChanged(obj: { [name: string]: any; }): boolean {
     return this.dataType.toLocaleLowerCase() !== obj.dataType.toLocaleLowerCase()
       || this.nullable !== Boolean(obj.nullable)
-      || this.autoIncrement !== Boolean(obj.autoIncrement)
+      || Boolean(this.autoIncrement) !== Boolean(obj.autoIncrement)
       || this.defaultValue !== obj.defaultValue;
   }
 

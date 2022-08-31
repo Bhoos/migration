@@ -17,10 +17,5 @@ export async function migrate(db: DatabaseBase, migration: (db: Database) => voi
   await db.migrate(version, queries);
 
   await db.commit();
-
-
 }
 
-function trimSQL(sql: string) {
-  return sql.split(/[\r\n]/).map(k => k.trim()).join('');
-}

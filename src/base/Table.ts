@@ -12,7 +12,7 @@ export class TableBase extends Entity implements Table {
   findColumn(column: string) {
     return this.columns.find(k => k.name === column);
   }
-  
+
   addConstraint(constraint: Constraint) {
     this.constraints.push(constraint);
   }
@@ -43,21 +43,20 @@ export class TableBase extends Entity implements Table {
   isChanged(obj: {[name: string]: any}) {
     if (this.columns.length !== obj.columns.length) return true;
     if (this.constraints.length !== obj.constraints.length) return true;
-
-    return this.columns.every(k => k.isChanged(obj.columns.find(o => o.name === k.name))) 
-      || this.constraints.every(k => k.isChanged(obj.contraints.find(c => c.name === k.name)));
+    return this.columns.some(k => k.isChanged(obj.columns.find(o => o.name === k.name)))
+      || this.constraints.some(k => k.isChanged(obj.constraints.find(c => c.name === k.name)));
   }
 
   createSQL() {
     return `CREATE TABLE ${this.db.quote(this.name)}(` +
       this.columns.map(col => col.createSQL()).concat(
-        this.constraints.map(cons => {
-          const sql = cons.createSQL();
-          if (Array.isArray(sql)) {
-            return sql.join(', ');
-          }
-          return sql;
-        })
+	this.constraints.map(cons => {
+	  const sql = cons.createSQL();
+	  if (Array.isArray(sql)) {
+	    return sql.join(', ');
+	  }
+	  return sql;
+	})
       ).join(', ') +
     `)`;
   }
@@ -67,27 +66,26 @@ export class TableBase extends Entity implements Table {
     return this;
   }
 
-  alterSQL(obj: {[name: string]: any}) {
+  alterSQL(newTable: {[name: string]: any}) {
     const sql = `ALTER TABLE ${this.db.quote(this.name)}`;
     const changes: string[] = [];
     // Figure out changes to columns
 
     const NAMES = ['COLUMN', 'CONSTRAINT'];
-
     ['columns', 'constraints'].forEach((cc, idx) => {
-      const { create, alter, drop } = seggregate(this[cc], obj[cc]);
+      const { create, alter, drop } = seggregate(this[cc], newTable[cc]);
 
       create.forEach((item) => {
-        changes.push('ADD ' + item.createSQL());
+	changes.push('ADD ' + item.createSQL());
       });
 
       alter.forEach((item) => {
-        const alters = item.alterSQL(obj[cc].find(c => c.name === item.name));
-        changes.push(...alters);
+	const alters = item.alterSQL(newTable[cc].find(c => c.name === item.name));
+	changes.push(...alters);
       });
 
       drop.forEach((item) => {
-        changes.push('DROP ' + NAMES[idx] + ' ' + this.db.quote(item.name));
+	changes.push('DROP ' + NAMES[idx] + ' ' + this.db.quote(item.name));
       });
     });
 

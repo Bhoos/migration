@@ -29,12 +29,12 @@ export abstract class Item {
   abstract isChanged(obj: { [name: string]: any }): boolean;
 }
 
-export function seggregate(items: Item[], objects: Array<{ [name: string]: any }>) {
-  const newItems = items.filter(item => !objects.find(obj => obj.name === item.name));
+export function seggregate(oldItems: Item[], newDefinition: Array<{ [name: string]: any }>) {
+  const newItems = oldItems.filter(item => !newDefinition.find(obj => obj.name === item.name));
 
   const alteredItems: Item[] = [];
-  const removedItems = objects.filter(obj => {
-    const matched = items.find(item => item.name === obj.name);
+  const removedItems = newDefinition.filter(obj => {
+    const matched = oldItems.find(item => item.name === obj.name);
     if (matched) {
       if (matched.isChanged(obj)) {
         alteredItems.push(matched);
