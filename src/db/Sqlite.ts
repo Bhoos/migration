@@ -3,6 +3,7 @@ import { IndexBase } from '../base/Index.js';
 import { TableBase } from '../base/Table.js';
 import { Driver } from '../drivers/Driver.js';
 import { ColumnBase } from '../base/Column.js';
+import { seggregate } from '../base/Item.js';
 
 // float, double = real
 export class SqliteColumn extends ColumnBase {
@@ -81,6 +82,41 @@ Also: Don't stress. sqlite tables are dynamically typed. so your code would work
 export class SqliteTable extends TableBase {
   createColumn(name: string): SqliteColumn {
     return new SqliteColumn(this, name);
+  }
+
+  alterSQL(newTable: { [name: string]: any }) {
+    const alterTable = `ALTER TABLE ${this.db.quote(this.name)} `;
+    const changes: string[] = [];
+    // Figure out changes to columns
+
+    // sqlite doesn't allow multiple ADD or DROP in single ALTER TABLE
+    // see syntax diagram at: https://www.sqlite.org/lang_altertable.html
+
+    const NAMES = ['COLUMN', 'CONSTRAINT'];
+    ['columns', 'constraints'].forEach((cc, idx) => {
+      const { create, alter, drop } = seggregate(this[cc], newTable[cc]);
+
+      create.forEach(item => {
+        changes.push(alterTable + 'ADD ' + item.createSQL());
+      });
+
+      alter.forEach(item => {
+        const alters = item.alterSQL(newTable[cc].find(c => c.name === item.name));
+        if (Array.isArray(alters)) {
+          changes.push(...alters.map(a => alterTable + a));
+        } else {
+          changes.push(alterTable + alter);
+        }
+      });
+
+      drop.forEach(item => {
+        changes.push(alterTable + 'DROP ' + NAMES[idx] + ' ' + this.db.quote(item.name));
+      });
+    });
+
+    if (changes.length === 0) return [];
+
+    return changes;
   }
 }
 
