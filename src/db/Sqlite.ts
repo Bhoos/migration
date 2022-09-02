@@ -6,6 +6,48 @@ import { ColumnBase } from '../base/Column.js';
 
 // float, double = real
 export class SqliteColumn extends ColumnBase {
+  get serial() {
+    this.autoIncrement = true;
+    return this.type('INTEGER');
+  }
+
+  get bigSerial() {
+    this.autoIncrement = true;
+    return this.type('INTEGER');
+  }
+
+  get int() {
+    return this.type('INTEGER');
+  }
+
+  get bigInt() {
+    return this.type('INTEGER');
+  }
+
+  get smallInt() {
+    return this.type('INTEGER');
+  }
+
+  get tinyInt() {
+    return this.type('INTEGER');
+  }
+
+  get float() {
+    return this.type('REAL');
+  }
+
+  get double() {
+    return this.type('REAL');
+  }
+
+  varchar(size: number) {
+    return this.type(`TEXT`);
+  }
+
+  get json() {
+    return this.type('TEXT');
+  }
+
   alterSQL(obj: { [name: string]: any }): string[] {
     console.log(
       `altering column:\n\tOld: ${this.name} ${this.dataType} ${

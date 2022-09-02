@@ -16,7 +16,7 @@ export class SqliteDriver implements Driver {
   async load() {
      await this.run(`CREATE TABLE IF NOT EXISTS "${this.migrationTable}"(
       id INTEGER NOT NULL,
-      timestamp INT NOT NULL,
+      timestamp INTEGER NOT NULL,
       entities TEXT,
       records TEXT,
       PRIMARY KEY ("id" AUTOINCREMENT)
