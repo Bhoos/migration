@@ -134,7 +134,7 @@ export class ColumnBase extends Item implements Column {
     }
 
     if (isDefaultValueChanged(this.defaultValue, obj.defaultValue)) {
-      res.push(`ALTER COLUMN ${this.db.quote(this.name)} ${this.defaultValue ? 'DROP DEFAULT' : `SET DEFAULT ${this.defaultValue}`}`);
+      res.push(`ALTER COLUMN ${this.db.quote(this.name)} ${!this.defaultValue ? 'DROP DEFAULT' : `SET DEFAULT ${this.defaultValue}`}`);
     }
 
     return res;
