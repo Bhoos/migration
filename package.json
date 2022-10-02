@@ -1,6 +1,6 @@
 {
   "name": "@bhoos/migration",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "type": "module",
   "description": "Bhoos Database Migration Support Library",
   "main": "es6/index.js",
