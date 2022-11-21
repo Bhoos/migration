@@ -20,7 +20,7 @@ class PostgresColumn extends ColumnBase {
         type = 'SERIAL';
       }
     }
-    return `${this.db.quote(this.name)} ${type} ${this.nullable ? 'NULL' : 'NOT NULL'}`
+    return `${this.db.quote(this.name)} ${type} ${this.nullable ? 'NULL' : 'NOT NULL'} ${this.defaultValue ? `DEFAULT ${this.defaultValue}`: ''}`
   }
 }
 
