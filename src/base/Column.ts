@@ -21,7 +21,7 @@ export class ColumnBase extends Item implements Column {
 
     obj.dataType = this.dataType;
     obj.nullable = this.nullable;
-
+    obj.defaultValue = this.defaultValue;
     return obj;
   }
 
@@ -119,7 +119,7 @@ export class ColumnBase extends Item implements Column {
   }
 
   createSQL(): string {
-    return `${this.db.quote(this.name)} ${this.dataType} ${this.nullable ? 'NULL' : 'NOT NULL'}`
+    return `${this.db.quote(this.name)} ${this.dataType} ${this.nullable ? 'NULL' : 'NOT NULL'} ${this.defaultValue ? `DEFAULT ${this.defaultValue}`: ''}`
   }
 
   alterSQL(obj: { [name: string]: any }) {
@@ -132,10 +132,18 @@ export class ColumnBase extends Item implements Column {
       res.push(`ALTER COLUMN ${this.db.quote(this.name)} ${this.nullable ? 'DROP NOT NULL' : 'SET NOT NULL'}`);
     }
 
-    if (this.defaultValue !== obj.defaultValue) {
-      res.push(`ALTER COLUMN ${this.db.quote(this.name)} ${this.defaultValue === null || this.defaultValue === undefined ? 'DROP DEFAULT' : `SET DEFAULT ${this.defaultValue}`}`);
+    if (isDefaultValueChanged(this.defaultValue, obj.defaultValue)) {
+      res.push(`ALTER COLUMN ${this.db.quote(this.name)} ${!this.defaultValue ? 'DROP DEFAULT' : `SET DEFAULT ${this.defaultValue}`}`);
     }
 
     return res;
   }
+}
+
+// Default value change check is a bit special as we
+// don't want to mark it as change for empty values
+// (null, undefined , '')
+function isDefaultValueChanged(newValue: string, oldValue: string) {
+  if (!newValue && !oldValue) return false;
+  return newValue !== oldValue; 
 }
