@@ -115,7 +115,7 @@ export class ColumnBase extends Item implements Column {
     return this.dataType.toLocaleLowerCase() !== obj.dataType.toLocaleLowerCase()
       || this.nullable !== Boolean(obj.nullable)
       || Boolean(this.autoIncrement) !== Boolean(obj.autoIncrement)
-      || this.defaultValue !== obj.defaultValue;
+      || isDefaultValueChanged(this.defaultValue, obj.defaultValue);
   }
 
   createSQL(): string {
