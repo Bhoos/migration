@@ -1,11 +1,16 @@
 import { DatabaseBase } from "./base/Database.js";
 import { Database } from "./types.js";
 
-export async function migrate(db: DatabaseBase, migration: (db: Database) => void) {
+export async function migrate(db: DatabaseBase,
+                              migration: (db: Database) => void,
+                              preMigration? : () => Promise<void>,
+                              postMigration? : () => Promise<void>) {
   // Perform the entire migration within a transaction
   await db.begin();
-
+  if (preMigration)
+    await preMigration();
   // Run the migration function
+  //   migration function defines the db schema required.
   migration(db);
   
   // Get the migration sql
@@ -16,6 +21,7 @@ export async function migrate(db: DatabaseBase, migration: (db: Database) => voi
   // Run all the migrations
   await db.migrate(version, queries);
 
+  if (postMigration)
+    await postMigration();
   await db.commit();
 }
-

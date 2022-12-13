@@ -50,10 +50,11 @@ export class SqliteColumn extends ColumnBase {
   }
 
   alterSQL(obj: { [name: string]: any }): string[] {
+    const newObj = { name : this.name, dataType: this.dataType, nullable : this.nullable, autoIncrement : this.autoIncrement};
     console.log(
-      `altering column:\n\tOld: ${this.name} ${this.dataType} ${
-        this.nullable
-      }\n\tNew: ${JSON.stringify(obj)}`,
+      `altering column:
+\tOld: ${JSON.stringify(obj)}
+\tNew: ${JSON.stringify(newObj)}`,
     );
     const res: string[] = [];
     if (this.dataType !== obj.dataType) {
@@ -67,7 +68,7 @@ Also: Don't stress. sqlite tables are dynamically typed. so your code would work
     }
 
     if (this.nullable !== Boolean(obj.nullable)) {
-      console.error('Cannot change NULLability of a column');
+      console.error('Cannot change NULLability of a column ' + obj.name + ' of table ' + this.table.name);
     }
 
     if (this.defaultValue !== obj.defaultValue) {
@@ -97,6 +98,9 @@ export class SqliteTable extends TableBase {
       const { create, alter, drop } = seggregate(this[cc], newTable[cc]);
 
       create.forEach(item => {
+        if (cc == 'constraints') {
+          throw new Error('Sqlite doesnot support adding constraints' + item.name);
+        }
         changes.push(alterTable + 'ADD ' + item.createSQL());
       });
 
