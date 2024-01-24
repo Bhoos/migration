@@ -7,6 +7,7 @@ export async function migrate(db: DatabaseBase,
                               postMigration? : () => Promise<void>) {
   // Perform the entire migration within a transaction
   await db.begin();
+  try {
   if (preMigration)
     await preMigration();
   // Run the migration function
@@ -24,4 +25,9 @@ export async function migrate(db: DatabaseBase,
   if (postMigration)
     await postMigration();
   await db.commit();
+  } catch (e) {
+    console.log('Migration failed rolling back', e);
+    await db.rollback();
+    throw e;
+  }
 }
